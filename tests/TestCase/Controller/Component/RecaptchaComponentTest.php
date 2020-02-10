@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Recaptcha\View\Helper\Test\TestCase\Controller\Component;
 
 use Cake\Controller\ComponentRegistry;
@@ -12,47 +14,74 @@ use Recaptcha\Controller\Component\RecaptchaComponent;
  */
 class RecaptchaComponentTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var \Cake\Controller\Controller
+     */
+    protected $controller;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|\Recaptcha\Controller\Component\RecaptchaComponent
+     */
+    protected $Recaptcha;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp() : void
     {
         parent::setUp();
 
         $this->controller = new Controller(new Request());
 
         $this->Recaptcha = $this->getMockBuilder(RecaptchaComponent::class)
-            ->setMethods(['apiCall'])
-            ->setConstructorArgs([
-                new ComponentRegistry($this->controller),
-                [
-                    'enable' => true,
-                    'sitekey' => 'sitekey',
-                    'theme' => 'theme',
-                    'type' => 'type',
-                    'lang' => 'lang',
-                ]
-            ])
-            ->getMock();
+                                ->onlyMethods(['apiCall'])
+                                ->setConstructorArgs([
+                                    new ComponentRegistry($this->controller),
+                                    [
+                                        'enable' => true,
+                                        'sitekey' => 'sitekey',
+                                        'theme' => 'theme',
+                                        'type' => 'type',
+                                        'lang' => 'lang',
+                                    ],
+                                ])
+                                ->getMock();
     }
 
+    /**
+     * testVerifyFalse
+     *
+     * @return void
+     */
     public function testVerifyFalse()
     {
         $this->assertFalse($this->Recaptcha->verify());
 
-        $this->controller->request = $this->controller->request->withData('g-recaptcha-response', 'foo');
+        $this->controller->setRequest(
+            $this->controller->getRequest()->withData('g-recaptcha-response', 'foo')
+        );
 
         $this->Recaptcha->expects($this->once())
-            ->method('apiCall')
-            ->will($this->returnValue(null));
+                        ->method('apiCall')
+                        ->will($this->returnValue(null));
 
         $this->assertFalse($this->Recaptcha->verify());
     }
 
-    public function testVerifyTrue()
+    /**
+     * testVerifyTrue
+     *
+     * @return void
+     */
+    public function testVerifyTrue(): void
     {
-        $this->controller->request = $this->controller->request->withData('g-recaptcha-response', 'foo');
+        $this->controller->setRequest(
+            $this->controller->getRequest()->withData('g-recaptcha-response', 'foo')
+        );
 
         $this->Recaptcha->expects($this->once())
-            ->method('apiCall')
-            ->will($this->returnValue('{"success":true}'));
+                        ->method('apiCall')
+                        ->will($this->returnValue(['success' => true]));
 
         $this->assertTrue($this->Recaptcha->verify());
 

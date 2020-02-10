@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 namespace Recaptcha\Controller\Component;
 
 use Cake\Controller\Component;
@@ -9,6 +11,16 @@ use Cake\Http\Client;
  */
 class RecaptchaComponent extends Component
 {
+    /**
+     * Api endpoint
+     */
+    const ENDPOINT = 'https://www.google.com/recaptcha/api/siteverify';
+
+    /**
+     * Name of passed recaptcha value inside request
+     */
+    const PARAMETER_NAME = 'g-recaptcha-response';
+
     /**
      * Default config
      *
@@ -33,7 +45,7 @@ class RecaptchaComponent extends Component
      * @param array $config config
      * @return void
      */
-    public function initialize(array $config = [])
+    public function initialize(array $config = []): void
     {
         $this->setConfig($config);
         $this->_registry->getController()->viewBuilder()->setHelpers(['Recaptcha.Recaptcha' => $this->_config]);
@@ -50,11 +62,11 @@ class RecaptchaComponent extends Component
         }
 
         $controller = $this->_registry->getController();
-        if ($controller->request->getData('g-recaptcha-response')) {
-            $response = json_decode($this->apiCall());
+        if ($controller->getRequest()->getData(self::PARAMETER_NAME)) {
+            $response = $this->apiCall();
 
-            if (isset($response->success)) {
-                return $response->success;
+            if (isset($response['success'])) {
+                return $response['success'];
             }
         }
 
@@ -64,7 +76,7 @@ class RecaptchaComponent extends Component
     /**
      * Call reCAPTCHA API to verify
      *
-     * @return string
+     * @return mixed
      * @codeCoverageIgnore
      */
     protected function apiCall()
@@ -72,10 +84,10 @@ class RecaptchaComponent extends Component
         $controller = $this->_registry->getController();
         $client = new Client($this->_config['httpClientOptions']);
 
-        return $client->post('https://www.google.com/recaptcha/api/siteverify', [
+        return $client->post(self::ENDPOINT, [
             'secret' => $this->_config['secret'],
-            'response' => $controller->request->getData('g-recaptcha-response'),
-            'remoteip' => $controller->request->clientIp()
-        ])->getBody();
+            'response' => $controller->getRequest()->getData(self::PARAMETER_NAME),
+            'remoteip' => $controller->getRequest()->clientIp()
+        ])->getJson();
     }
 }

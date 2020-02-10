@@ -10,10 +10,18 @@ use Recaptcha\View\Helper\RecaptchaHelper;
  */
 class RecaptchaHelperTest extends TestCase
 {
+    protected $View;
 
-    public function setUp()
+    protected $Recaptcha;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp(): void
     {
         parent::setUp();
+
+        $this->loadPlugins(['Recaptcha']);
 
         $this->View = new View();
         $this->Recaptcha = new RecaptchaHelper(
@@ -29,11 +37,16 @@ class RecaptchaHelperTest extends TestCase
         );
     }
 
+    /**
+     * testDisplay
+     *
+     * @return void
+     */
     public function testDisplay()
     {
         $result = $this->Recaptcha->display();
         $this->assertTrue(is_string($result));
-        $this->assertContains('class="g-recaptcha"', $result);
+        $this->assertStringContainsString('class="g-recaptcha"', $result);
 
         $this->Recaptcha->setConfig('enable', false);
         $this->assertEmpty($this->Recaptcha->display());
