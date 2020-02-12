@@ -6,7 +6,7 @@ namespace Recaptcha;
 use Cake\Core\BasePlugin;
 
 /**
- * Plugin for BassSurgeryCenter
+ * Plugin for Recaptcha
  */
 class Plugin extends BasePlugin
 {

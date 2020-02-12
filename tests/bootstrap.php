@@ -26,17 +26,17 @@ unset($findRoot);
 
 chdir($root);
 
-require_once $root . '/vendor/autoload.php';
+require_once 'vendor/autoload.php';
 
 /**
  * Define fallback values for required constants and configuration.
  * To customize constants and configuration remove this require
  * and define the data required by your plugin here.
  */
-require_once $root . '/vendor/cakephp/cakephp/tests/bootstrap.php';
+require_once 'vendor/cakephp/cakephp/tests/bootstrap.php';
 
-if (file_exists($root . '/config/bootstrap.php')) {
-    require $root . '/config/bootstrap.php';
+if (file_exists('config/bootstrap.php')) {
+    require 'config/bootstrap.php';
 
     return;
 }
