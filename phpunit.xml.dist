@@ -28,9 +28,10 @@
         </listener>
     </listeners>
 
+    <!-- Prevent coverage reports from looking in tests and vendors -->
     <filter>
         <whitelist>
-            <directory suffix=".php">./src/</directory>
+            <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
 </phpunit>
